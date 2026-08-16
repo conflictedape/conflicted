@@ -1,0 +1,484 @@
+---
+title: 'Building a Modern Portfolio with Astro & MDX'
+description: 'A deep dive into setting up Astro with MDX, content collections, and all the tooling for a blazing-fast blog.'
+publishDate: 2024-01-15
+author: 'Conflicted Ape'
+tags: ['astro', 'mdx', 'typescript', 'portfolio']
+draft: false
+---
+
+import {
+	Callout,
+	Image,
+	Gif,
+	Video,
+	Youtube,
+	Spacer,
+	Card,
+	CardGrid,
+	X,
+	Reddit,
+	JsonViewer,
+} from '@/components/mdx';
+
+A portfolio should feel personal, fast, and easy to evolve. I wanted a setup where writing a new post felt as simple as opening a folder, creating an `index.mdx` file, and shipping. Astro gave me the performance baseline, while MDX gave me the flexibility to mix content with small interactive components when a plain paragraph was not enough.
+
+## Why Astro and MDX fit together
+
+Astro lets me keep the public site **static by default**, which keeps deploys simple and performance excellent. MDX adds the missing layer: the ability to write long-form content with familiar Markdown syntax while still embedding custom UI when I need richer explanations.
+
+> The sweet spot for a personal site is a stack that stays boring for content and powerful for edge cases.
+
+A good authoring system should make these tasks easy:
+
+- Drafting and publishing new posts quickly
+- Reusing callouts, image blocks, and code snippets
+- Keeping metadata structured and type-safe
+- Generating RSS and a sitemap automatically
+
+### The workflow I was aiming for
+
+1. Create a folder under `src/content/blog/`
+2. Add frontmatter for title, summary, and dates
+3. Write in Markdown first
+4. Drop into MDX only when a richer component helps the story
+
+#### Small details matter
+
+Even little features like tag pills, heading links, and reading-time estimates make a blog feel more complete. They are easy to skip at the beginning, but they pay off once the number of posts grows.
+
+<Callout type="note">
+	Structured content collections are a huge upgrade over loose Markdown files
+	because they catch bad metadata before a post ever reaches production.
+</Callout>
+
+## Content collections keep the system honest
+
+Astro content collections add a schema layer around content. That means dates are coerced correctly, optional fields are explicit, and drafts are easy to filter out during builds.
+
+```ts {6-14}
+// src/content.config.ts
+import { glob } from 'astro/loaders';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
+
+const blog = defineCollection({
+	loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+		publishDate: z.coerce.date(),
+		tags: z.array(z.string()).default([]),
+		draft: z.boolean().default(false),
+	}),
+});
+
+export const collections = { blog };
+```
+
+The nice part is that this pattern scales. Today it is just a blog, but later it could support case studies, changelogs, or notes using the same approach.
+
+<Callout type="tip">
+	If a field might eventually be derived automatically, such as reading time,
+	keep it optional in the schema and compute it as a fallback in the page layer.
+</Callout>
+
+## Styling content without losing control
+
+Raw Markdown is useful, but it rarely matches the rest of a design system without a little work. I prefer styling a dedicated content wrapper instead of depending on generic defaults. That makes it clear how lists, blockquotes, tables, and code should look in both light and dark themes.
+
+Here is a quick comparison:
+
+| Concern     | Plain Markdown     | Styled MDX system                 |
+| ----------- | ------------------ | --------------------------------- |
+| Headings    | Browser defaults   | Branded scale and spacing         |
+| Tables      | Bare HTML table    | Responsive, bordered, readable    |
+| Code blocks | Functional         | Syntax highlighted and consistent |
+| Media       | Unstyled image tag | Framed image with captions        |
+
+Inline emphasis also matters. You should be able to mix **strong statements**, _softer nuance_, and `inline code` naturally inside normal paragraphs.
+
+---
+
+## Media and visual rhythm
+
+Text-heavy posts need a visual break now and then. A framed image component gives the article some breathing room without pulling attention away from the writing.
+
+<Image
+	src="https://picsum.photos/800/400"
+	alt="A placeholder hero image for the Astro portfolio article"
+	caption="A wide placeholder image standing in for a project screenshot or design exploration."
+/>
+
+Unordered lists are still one of the best tools for scannable writing:
+
+- Keep each point short enough to skim
+- Group related ideas under strong headings
+- Use components sparingly so they stay meaningful
+
+And ordered lists are perfect when the reader needs sequence:
+
+1. Install the missing integrations and content tooling
+2. Define the collection schema once
+3. Create reusable MDX components
+4. Render posts through typed pages and feeds
+
+<Callout type="warning">
+	Do not over-engineer the first version of a blog. It is better to ship a
+	readable system with a few polished components than to delay writing because
+	the tooling is still evolving.
+</Callout>
+
+## Syntax highlighting and reusable code blocks
+
+Astro's built-in syntax highlighting is enough for most examples. When I need a more editorial code presentation, a custom MDX component gives me a filename header and copy button.
+
+```ts filename="src/lib/remark-reading-time.ts"
+import { toString as mdastToString } from 'mdast-util-to-string';
+import getReadingTime from 'reading-time';
+import type { Root } from 'mdast';
+import type { VFile } from 'vfile';
+
+export function remarkReadingTime() {
+	return function (tree: Root, file: VFile) {
+		const text = mdastToString(tree, { includeImageAlt: false });
+		const { text: readingTime } = getReadingTime(text);
+		const astroData = (file.data.astro ?? {}) as {
+			frontmatter?: Record<string, unknown>;
+		};
+		astroData.frontmatter = { ...astroData.frontmatter, readingTime };
+		file.data.astro = astroData;
+	};
+}
+```
+
+This remark plugin runs once at build time during AST traversal. `mdast-util-to-string` extracts only real prose — headings, paragraphs, list items — skipping JSX tags, imports, and component props that would inflate a naive word count on `post.body`.
+
+That split works well in practice: fenced blocks for everyday snippets, and a richer `CodeBlock` component when presentation matters.
+
+<Callout type="danger">
+	A blog can look finished while still being fragile. If build, lint, and
+	formatting do not pass, the system is not done yet.
+</Callout>
+
+---
+
+## Media component showcase
+
+### GIF — full width (default)
+
+<Gif
+	src="https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif"
+	caption="Full-width GIF"
+/>
+
+### GIF — restricted to sm width (square-friendly)
+
+<Gif
+	src="https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif"
+	width="sm"
+	caption="Small-width GIF"
+/>
+
+### GIF — custom pixel width
+
+<Gif
+	src="https://media.giphy.com/media/3o7TKSjRrfIPjeiVyM/giphy.gif"
+	width={480}
+	caption="480px wide GIF"
+/>
+
+### Video — with controls
+
+<Video
+	src="https://www.w3schools.com/html/mov_bbb.mp4"
+	caption="Standard video with playback controls"
+/>
+
+### Video — medium width, autoplay loop (cinematic clip style)
+
+<Video
+	src="https://www.w3schools.com/html/mov_bbb.mp4"
+	width="md"
+	autoplay
+	loop
+	muted
+	caption="Medium-width muted looping clip"
+/>
+
+### YouTube — inline card (Notion-style)
+
+<Youtube
+	id="dQw4w9WgXcQ"
+	title="Rick Astley — Never Gonna Give You Up"
+	variant="inline"
+/>
+
+### YouTube — default width
+
+<Youtube
+	id="dQw4w9WgXcQ"
+	title="Rick Astley — Never Gonna Give You Up"
+	caption="Default md width embed"
+/>
+
+### YouTube — full width
+
+<Youtube
+	id="dQw4w9WgXcQ"
+	title="Rick Astley — Never Gonna Give You Up"
+	width="full"
+	caption="Full-width embed"
+/>
+
+### YouTube — small width, start at 30s
+
+<Youtube
+	id="dQw4w9WgXcQ"
+	title="Rick Astley — Never Gonna Give You Up"
+	width="sm"
+	start={30}
+	caption="Small embed, jumps to 0:30"
+/>
+
+### X — full embed (dark theme)
+
+<X
+	id="20"
+	user="jack"
+	theme="dark"
+	caption="The first ever tweet."
+	client:load
+/>
+
+### X — full embed (light theme, small width, right aligned)
+
+<X
+	id="20"
+	user="jack"
+	theme="light"
+	width="sm"
+	align="right"
+	caption="Same post, light theme, small width, right-aligned"
+	client:load
+/>
+
+### X — real-world example
+
+<X
+	id="2062540646657994836"
+	user="notsky"
+	theme="dark"
+	width="lg"
+	align="center"
+	caption="Official X embed via widgets.js"
+	client:load
+/>
+
+### Reddit — full embed (dark theme)
+
+<Reddit
+	subreddit="IAmA"
+	postId="z1c9z"
+	title="I am Barack Obama, President of the United States -- AMA"
+	author="barackobama"
+	theme="dark"
+	caption="A real Reddit AMA thread, embedded via Reddit's official widgets.js"
+	client:load
+/>
+
+### Reddit — light theme, small width, left aligned
+
+<Reddit
+	subreddit="IAmA"
+	postId="z1c9z"
+	title="I am Barack Obama, President of the United States -- AMA"
+	author="barackobama"
+	theme="light"
+	width="sm"
+	align="left"
+	height={350}
+	caption="Same post, light theme, small width, left-aligned, shorter height"
+	client:load
+/>
+
+## Final thoughts
+
+A modern portfolio blog should support writing first and tooling second. Once the foundation is in place, publishing becomes a lightweight habit instead of a mini project every time.
+
+The result I wanted was simple:
+
+- Fast static pages
+- Type-safe content metadata
+- Reusable MDX building blocks
+- Automatic discovery via RSS and sitemap
+
+If the system makes publishing easier next month than it was today, then it is doing its job.
+
+---
+
+## Card grid showcase
+
+### 2 columns × 2 rows
+
+<CardGrid cols={2}>
+	<Card title="Lawful Good" icon="😇">
+		<p>Google & other search engines pretending to be relevant</p>
+		<ul>
+			<li>Googlebot</li>
+			<li>DDG Crawler</li>
+			<li>Bingbot</li>
+		</ul>
+	</Card>
+	<Card title="Neutral Good" icon="😊">
+		<p>Bot protection as a service</p>
+		<ul>
+			<li>Cloudflare</li>
+			<li>Datadome</li>
+			<li>Imperva</li>
+			<li>Akamai</li>
+		</ul>
+	</Card>
+	<Card title="Lawful Neutral" icon="😐">
+		<p>Home automation</p>
+		<ul>
+			<li>IoT (Internet of Things)</li>
+			<li>Home assistant</li>
+		</ul>
+	</Card>
+	<Card title="True Neutral" icon="😐">
+		<p>Independently run bots for small-scale automation</p>
+		<ul>
+			<li>
+				The 50 line python code your friend wrote to make an anime command for
+				his Discord bot
+			</li>
+		</ul>
+	</Card>
+</CardGrid>
+
+### 3 columns × 3 rows
+
+<CardGrid cols={3}>
+	<Card title="Lawful Good" icon="😇">
+		<p>Google & other search engines pretending to be relevant</p>
+		<ul>
+			<li>Googlebot</li>
+			<li>DDG Crawler</li>
+			<li>Bingbot</li>
+		</ul>
+	</Card>
+	<Card title="Neutral Good" icon="😊">
+		<p>Bot protection as a service</p>
+		<ul>
+			<li>Cloudflare</li>
+			<li>Datadome</li>
+			<li>Imperva</li>
+			<li>Akamai</li>
+		</ul>
+	</Card>
+	<Card title="Chaotic Good" icon="😇">
+		<p>Port scanning as a service</p>
+		<ul>
+			<li>Shodan.io</li>
+			<li>
+				The security researchers who keep pinging my server like a million times
+				a week with masscan
+			</li>
+		</ul>
+	</Card>
+	<Card title="Lawful Neutral" icon="😐">
+		<p>Home automation</p>
+		<ul>
+			<li>IoT (Internet of Things)</li>
+			<li>Home assistant</li>
+		</ul>
+	</Card>
+	<Card title="True Neutral" icon="😐">
+		<p>Independently run bots for small-scale automation</p>
+		<ul>
+			<li>
+				The 50 line python code your friend wrote to make an anime command for
+				his Discord bot
+			</li>
+		</ul>
+	</Card>
+	<Card title="Chaotic Neutral" icon="😐">
+		<p>Proxy and abuse tooling vendors</p>
+		<ul>
+			<li>Oxylabs</li>
+			<li>Luminati</li>
+			<li>2Captcha</li>
+		</ul>
+	</Card>
+	<Card title="Lawful Evil" icon="😈" />
+	<Card title="Neutral Evil" icon="😈">
+		<p>Botting as a service</p>
+		<ul>
+			<li>GPU Scalpers</li>
+			<li>Sneakerbots</li>
+			<li>Votebots</li>
+			<li>Automated account cracking</li>
+		</ul>
+	</Card>
+	<Card title="Chaotic Evil" icon="😈">
+		<p>Purely malicious hacking and/or service denial</p>
+		<ul>
+			<li>DDOS</li>
+			<li>Destructionware</li>
+		</ul>
+	</Card>
+</CardGrid>
+
+## JSON viewer showcase
+
+### Collapsed by default
+
+<JsonViewer
+	defaultExpandDepth={0}
+	caption="Click the arrow to expand each level, one root at a time"
+	data={{
+		id: 1024,
+		name: 'Conflicted Ape',
+		active: true,
+		role: null,
+		tags: ['astro', 'mdx', 'typescript'],
+		social: {
+			github: 'conflictedape',
+			twitter: '@conflictedape',
+			links: {
+				website: 'https://conflictedape.dev',
+				blog: 'https://conflictedape.dev/blog',
+			},
+		},
+		posts: [
+			{
+				title: 'Building a Modern Portfolio with Astro & MDX',
+				publishDate: '2024-01-15',
+			},
+			{ title: 'Draft post', publishDate: null },
+		],
+	}}
+	client:load
+/>
+
+### Expanded one level by default
+
+<JsonViewer
+	defaultExpandDepth={1}
+	caption="Top-level keys start open; nested objects/arrays stay collapsed until clicked"
+	data={{
+		request: {
+			method: 'GET',
+			url: '/api/posts',
+			headers: { accept: 'application/json', authorization: 'Bearer ***' },
+		},
+		response: {
+			status: 200,
+			body: { posts: [{ id: 1, title: 'Hello world' }], total: 1 },
+		},
+	}}
+	client:load
+/>
+
+<Spacer size="xl" />

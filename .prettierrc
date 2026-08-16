@@ -1,0 +1,24 @@
+{
+	"semi": true,
+	"singleQuote": true,
+	"useTabs": true,
+	"tabWidth": 2,
+	"trailingComma": "es5",
+	"printWidth": 100,
+	"plugins": ["prettier-plugin-astro", "prettier-plugin-tailwindcss"],
+	"overrides": [
+		{
+			"files": "*.astro",
+			"options": {
+				"parser": "astro"
+			}
+		},
+		{
+			"comment": "COMMENT: Added 80 printwidth to mdx for better code readability in blog posts",
+			"files": "*.mdx",
+			"options": {
+				"printWidth": 80
+			}
+		}
+	]
+}
