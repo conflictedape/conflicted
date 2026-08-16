@@ -9,9 +9,10 @@ import rehypeExternalLinks from 'rehype-external-links';
 import rehypeSlug from 'rehype-slug';
 import { transformerMetaHighlight, transformerNotationHighlight } from '@shikijs/transformers';
 import { remarkReadingTime } from './src/lib/remark-reading-time';
+import { SITE_URL } from './src/lib/constants';
 
 export default defineConfig({
-	site: '',
+	site: SITE_URL,
 	compressHTML: true,
 	integrations: [mdx(), react(), sitemap()],
 	markdown: {
