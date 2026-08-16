@@ -4,13 +4,14 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 
 import { Callout, CodeBlock, Gif, Image, Pre, Table, TOC, Video, Youtube } from '@/components/mdx';
 import Layout from '@/layouts/Layout.astro';
+import { IS_DEV } from '@/lib/constants';
 
 interface Props {
 	post: CollectionEntry<'blog'>;
 }
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog', ({ data }) => !data.draft);
+	const posts = await getCollection('blog', ({ data }) => IS_DEV || !data.draft);
 
 	return posts.map((post) => ({
 		params: { slug: post.id.replace(/\/index$/, '') },
@@ -42,7 +43,14 @@ const mdxComponents = {
 		<div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
 			<article class="min-w-0">
 				<header class="border-border mb-10 border-b pb-8">
-					<p class="text-primary text-sm font-semibold tracking-[0.2em] uppercase">Blog post</p>
+					<div class="flex flex-wrap items-center gap-3">
+						<p class="text-primary text-sm font-semibold tracking-[0.2em] uppercase">Blog post</p>
+						{post.data.draft ? (
+							<span class="border-primary/40 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-xs font-semibold tracking-wide uppercase">
+								Draft
+							</span>
+						) : null}
+					</div>
 					<h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
 						{post.data.title}
 					</h1>
