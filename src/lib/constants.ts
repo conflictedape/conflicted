@@ -1,5 +1,14 @@
 export const SITE_URL = process.env.SITE_URL || 'https://conflictedape.dev';
-export const BASE_PATH = process.env.BASE_PATH || '/';
+
+// Ensures a leading and trailing slash regardless of how BASE_PATH is..
+// consumer (Astro's `base` config, and in turn `import.meta.env.BASE_URL`)
+// can safely concatenate paths without worrying about missing slashes.
+function normalizeBasePath(path: string): string {
+	const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
+	return withLeadingSlash.endsWith('/') ? withLeadingSlash : `${withLeadingSlash}/`;
+}
+
+export const BASE_PATH = normalizeBasePath(process.env.BASE_PATH || '/');
 
 // `import.meta.env.DEV` is true for `astro dev`/local builds and false for
 // production builds (`astro build`). Reused wherever behavior should differ
