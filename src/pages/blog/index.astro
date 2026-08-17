@@ -50,7 +50,7 @@ const posts = await Promise.all(
 										) : null}
 									</div>
 									<h2 class="text-2xl font-semibold tracking-tight">
-										<a href={`/blog/${postSlug}/`} class="hover:text-primary transition-colors">
+										<a href={`${import.meta.env.BASE_URL}blog/${postSlug}/`} class="hover:text-primary transition-colors">
 											{post.data.title}
 										</a>
 									</h2>

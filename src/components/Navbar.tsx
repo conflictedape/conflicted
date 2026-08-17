@@ -3,7 +3,9 @@ import { Menu, Moon, Sun, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
-const navLinks: { label: string; href: string }[] = [{ label: 'Blog', href: '/blog/' }];
+const navLinks: { label: string; href: string }[] = [
+	{ label: 'Blog', href: `${import.meta.env.BASE_URL}blog/` },
+];
 
 export default function Navbar() {
 	const [dark, setDark] = useState(() => {
