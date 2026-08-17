@@ -1,4 +1,5 @@
-export const SITE_URL = 'https://conflictedape.dev'
+export const SITE_URL = process.env.SITE_URL || 'https://conflictedape.dev';
+export const BASE_PATH = process.env.BASE_PATH || '/';
 
 // `import.meta.env.DEV` is true for `astro dev`/local builds and false for
 // production builds (`astro build`). Reused wherever behavior should differ

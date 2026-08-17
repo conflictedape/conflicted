@@ -2,7 +2,7 @@ name: Deploy Astro site to Pages
 
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
 
   workflow_dispatch:
 
@@ -12,13 +12,15 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: 'pages'
   cancel-in-progress: false
 
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    env:
+      BASE_PATH: /conflicted
 
     steps:
       - name: Checkout

@@ -16,6 +16,11 @@ dist-ssr
 *.local
 tasks.txt
 
+# env
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -30,5 +35,7 @@ tasks.txt
 # AI agents
 .agents
 CONTEXT.md
-.github
+.github/instructions
+.github/copilot-instructions.md
+.github/mcp.json
 todo

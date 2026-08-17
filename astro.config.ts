@@ -8,11 +8,13 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeExternalLinks from 'rehype-external-links';
 import rehypeSlug from 'rehype-slug';
 import { transformerMetaHighlight, transformerNotationHighlight } from '@shikijs/transformers';
+import 'dotenv/config';
 import { remarkReadingTime } from './src/lib/remark-reading-time';
-import { SITE_URL } from './src/lib/constants';
+import { SITE_URL, BASE_PATH } from './src/lib/constants';
 
 export default defineConfig({
 	site: SITE_URL,
+	base: BASE_PATH,
 	compressHTML: true,
 	integrations: [mdx(), react(), sitemap()],
 	markdown: {
