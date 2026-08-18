@@ -1,10 +1,50 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import { format } from 'date-fns';
+
+import ContentTabs from '@/components/home/ContentTabs';
+import Hero from '@/components/home/Hero.astro';
+import LikedTracks from '@/components/home/LikedTracks.astro';
+import Stats from '@/components/home/Stats.astro';
+import { PROJECTS } from '@/data/projects';
+import Layout from '@/layouts/Layout.astro';
+import { IS_DEV } from '@/lib/constants';
+import { takeLatest } from '@/lib/home';
+
+const rawPosts = (await getCollection('blog', ({ data }) => IS_DEV || !data.draft)).sort(
+	(a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
+);
+
+const latestPosts = takeLatest(rawPosts, 5);
+
+const articles = latestPosts.map((post) => {
+	const slug = post.id.replace(/\/index$/, '');
+	return {
+		title: post.data.title,
+		href: `${import.meta.env.BASE_URL}blog/${slug}/`,
+		date: format(post.data.publishDate, 'MMMM d, yyyy'),
+		excerpt: post.data.description,
+	};
+});
+
+const projects = takeLatest(PROJECTS, 10).map((project) => ({
+	title: project.title,
+	href: project.href,
+	date: format(new Date(project.date), 'MMMM d, yyyy'),
+	excerpt: project.excerpt,
+}));
 ---
 
 <Layout>
-	<main class="container mx-auto p-8">
-		<h1 class="text-4xl font-bold">Portfolio</h1>
-		<p class="text-muted-foreground mt-4">Coming soon.</p>
+	<main class="mx-auto max-w-5xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
+		<Hero />
+		<Stats />
+
+		<div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
+			<div class="min-w-0">
+				<ContentTabs client:load articles={articles} projects={projects} />
+			</div>
+			<LikedTracks />
+		</div>
 	</main>
 </Layout>

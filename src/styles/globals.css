@@ -331,6 +331,14 @@ html.dark .mdx-content pre span:not(.line) {
 		@apply text-muted-foreground text-base leading-7;
 	}
 
+	.mdx-content li {
+		@apply leading-6;
+	}
+
+	.mdx-content li > p {
+		margin: 0;
+	}
+
 	.mdx-content strong {
 		@apply text-foreground font-semibold;
 	}
@@ -404,7 +412,7 @@ html.dark .mdx-content pre span:not(.line) {
 	}
 
 	.mdx-content li + li {
-		margin-top: 0.5rem;
+		margin-top: 0.25rem;
 	}
 
 	.mdx-content hr {

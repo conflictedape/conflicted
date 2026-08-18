@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+
+import { PROFILE } from '@/data/profile';
+import { PROJECTS } from '@/data/projects';
+import { IS_DEV } from '@/lib/constants';
+
+const posts = await getCollection('blog', ({ data }) => IS_DEV || !data.draft);
+
+const stats = [
+	{ value: String(PROFILE.stats.yearsExperience), label: 'years experience' },
+	{ value: PROFILE.stats.githubStars, label: 'GitHub stars' },
+	{ value: String(posts.length), label: 'articles written' },
+	{ value: String(PROJECTS.length), label: 'open source projects' },
+];
+---
+
+<div class="border-border flex flex-wrap gap-x-10 gap-y-4 border-y py-6">
+	{
+		stats.map((stat) => (
+			<p class="text-muted-foreground text-sm">
+				<span class="text-foreground font-bold">{stat.value}</span> {stat.label}
+			</p>
+		))
+	}
+</div>

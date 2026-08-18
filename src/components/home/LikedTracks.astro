@@ -1,0 +1,31 @@
+---
+import { Music } from 'lucide-react';
+
+import { TRACKS } from '@/data/tracks';
+---
+
+{
+	TRACKS.length > 0 && (
+		<aside class="border-border bg-card/60 border p-5">
+			<p class="text-muted-foreground mb-4 flex items-center gap-2 text-sm font-semibold tracking-[0.2em] uppercase">
+				<Music className="h-4 w-4" />
+				Liked tracks
+			</p>
+			<ul class="space-y-4">
+				{TRACKS.map((track) => (
+					<li class="flex items-center gap-3">
+						<span class="bg-muted border-border flex h-10 w-10 shrink-0 items-center justify-center border">
+							<Music className="text-muted-foreground h-4 w-4" />
+						</span>
+						<span class="min-w-0">
+							<span class="text-foreground block truncate text-sm font-semibold">
+								{track.title}
+							</span>
+							<span class="text-muted-foreground block truncate text-xs">{track.artist}</span>
+						</span>
+					</li>
+				))}
+			</ul>
+		</aside>
+	)
+}
