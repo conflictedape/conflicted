@@ -51,13 +51,10 @@ function durationForDistance(distancePx: number): number {
 }
 
 /**
- * Smoothly scroll to a heading element using a custom cubic bezier easing.
- * Duration is automatically derived from the scroll distance.
+ * Animate window.scrollY from its current position to `targetY` using a
+ * cubic bezier easing. Duration is automatically derived from the distance.
  */
-export function scrollToHeading(element: HTMLElement, easing: BezierTuple = DEFAULT_EASING): void {
-	const targetY =
-		element.getBoundingClientRect().top + window.scrollY - NAVBAR_HEIGHT - SCROLL_OFFSET;
-
+function animateScrollTo(targetY: number, easing: BezierTuple): void {
 	const startY = window.scrollY;
 	const distance = targetY - startY;
 	const duration = durationForDistance(distance);
@@ -75,4 +72,23 @@ export function scrollToHeading(element: HTMLElement, easing: BezierTuple = DEFA
 	}
 
 	requestAnimationFrame(step);
+}
+
+/**
+ * Smoothly scroll to a heading element using a custom cubic bezier easing.
+ * Duration is automatically derived from the scroll distance.
+ */
+export function scrollToHeading(element: HTMLElement, easing: BezierTuple = DEFAULT_EASING): void {
+	const targetY =
+		element.getBoundingClientRect().top + window.scrollY - NAVBAR_HEIGHT - SCROLL_OFFSET;
+
+	animateScrollTo(targetY, easing);
+}
+
+/**
+ * Smoothly scroll all the way back to the top of the page using the same
+ * cubic bezier easing as `scrollToHeading`.
+ */
+export function scrollToTop(easing: BezierTuple = DEFAULT_EASING): void {
+	animateScrollTo(0, easing);
 }

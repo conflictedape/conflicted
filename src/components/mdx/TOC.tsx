@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { DEFAULT_EASING, scrollToHeading, type BezierTuple } from '@/lib/smooth-scroll';
+import {
+	DEFAULT_EASING,
+	scrollToHeading,
+	scrollToTop,
+	type BezierTuple,
+} from '@/lib/smooth-scroll';
 
 interface Heading {
 	depth: number;
@@ -13,12 +18,16 @@ interface TOCProps {
 	scrollEasing?: BezierTuple;
 }
 
+// Sentinel slug representing "top of the page" (before any heading), so the
+// "On this page" label can be highlighted/clicked the same way as a heading.
+const TOP_SLUG = '__top__';
+
 export function TOC({ headings, scrollEasing = DEFAULT_EASING }: TOCProps) {
 	const filteredHeadings = useMemo(
 		() => headings.filter((heading) => heading.depth === 2 || heading.depth === 3),
 		[headings]
 	);
-	const [activeSlug, setActiveSlug] = useState(filteredHeadings[0]?.slug ?? '');
+	const [activeSlug, setActiveSlug] = useState(TOP_SLUG);
 	const easingRef = useRef(scrollEasing);
 	easingRef.current = scrollEasing;
 	const clickScrollingRef = useRef(false);
@@ -45,7 +54,7 @@ export function TOC({ headings, scrollEasing = DEFAULT_EASING }: TOCProps) {
 			scrollEndTimerRef.current = setTimeout(() => {
 				clickScrollingRef.current = false;
 				const slug = getActiveSlug();
-				if (slug) setActiveSlug(slug);
+				setActiveSlug(slug ?? TOP_SLUG);
 			}, 150);
 		}
 
@@ -70,11 +79,26 @@ export function TOC({ headings, scrollEasing = DEFAULT_EASING }: TOCProps) {
 		history.pushState(null, '', `#${slug}`);
 	}
 
+	function handleTopClick(e: React.MouseEvent<HTMLAnchorElement>) {
+		e.preventDefault();
+		clickScrollingRef.current = true;
+		setActiveSlug(TOP_SLUG);
+		scrollToTop(easingRef.current);
+		history.pushState(null, '', window.location.pathname + window.location.search);
+	}
+
 	return (
 		<aside className="border-border bg-card/60 sticky top-24 rounded-xl border p-5 shadow-sm backdrop-blur">
-			<p className="text-muted-foreground mb-4 text-sm font-semibold tracking-[0.2em] uppercase">
+			<a
+				href="#"
+				onClick={handleTopClick}
+				className={[
+					'mb-4 block text-sm font-semibold tracking-[0.2em] uppercase transition-colors',
+					activeSlug === TOP_SLUG ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
+				].join(' ')}
+			>
 				On this page
-			</p>
+			</a>
 			<nav aria-label="Table of contents">
 				<ol className="space-y-2">
 					{filteredHeadings.map((heading) => {
