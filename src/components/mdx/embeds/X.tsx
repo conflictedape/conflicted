@@ -1,44 +1,49 @@
-import { useEffect, useRef } from 'react'
-import { loadEmbedScript } from '@/components/mdx/embeds/loadEmbedScript'
-import { justifyClassName, resolveWidth, type Align, type MediaWidth } from '@/components/mdx/embeds/layout'
+import { useEffect, useRef } from 'react';
+import { loadEmbedScript } from '@/components/mdx/embeds/loadEmbedScript';
+import {
+	justifyClassName,
+	resolveWidth,
+	type Align,
+	type MediaWidth,
+} from '@/components/mdx/embeds/layout';
 
 declare global {
 	interface Window {
 		twttr?: {
-			widgets: { load: (el?: HTMLElement) => void }
-		}
+			widgets: { load: (el?: HTMLElement) => void };
+		};
 	}
 }
 
-const WIDGETS_SRC = 'https://platform.twitter.com/widgets.js'
+const WIDGETS_SRC = 'https://platform.twitter.com/widgets.js';
 
 interface XProps {
 	/** Numeric tweet/post ID from the URL, e.g. "1234567890123456789" */
-	id: string
+	id: string;
 	/** Handle without the @, used to build the tweet URL, e.g. "elonmusk" */
-	user: string
-	caption?: string
-	width?: MediaWidth
-	align?: Align
+	user: string;
+	caption?: string;
+	width?: MediaWidth;
+	align?: Align;
 	/** Match the tweet embed theme to the surrounding page. */
-	theme?: 'light' | 'dark'
+	theme?: 'light' | 'dark';
 }
 
 export function X({ id, user, caption, width = 'md', align = 'center', theme = 'dark' }: XProps) {
-	const containerRef = useRef<HTMLDivElement>(null)
+	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		let cancelled = false
+		let cancelled = false;
 		loadEmbedScript(WIDGETS_SRC).then(() => {
-			if (!cancelled && containerRef.current) window.twttr?.widgets.load(containerRef.current)
-		})
+			if (!cancelled && containerRef.current) window.twttr?.widgets.load(containerRef.current);
+		});
 		return () => {
-			cancelled = true
-		}
-	}, [id, user, theme])
+			cancelled = true;
+		};
+	}, [id, user, theme]);
 
-	const tweetUrl = `https://x.com/${user}/status/${id}`
-	const { className, style } = resolveWidth(width)
+	const tweetUrl = `https://x.com/${user}/status/${id}`;
+	const { className, style } = resolveWidth(width);
 
 	return (
 		<figure className="my-8">
@@ -56,5 +61,5 @@ export function X({ id, user, caption, width = 'md', align = 'center', theme = '
 				</figcaption>
 			) : null}
 		</figure>
-	)
+	);
 }

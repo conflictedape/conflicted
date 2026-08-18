@@ -1,22 +1,27 @@
-import { useEffect, useRef } from 'react'
-import { loadEmbedScript, reprocessEmbedScript } from '@/components/mdx/embeds/loadEmbedScript'
-import { justifyClassName, resolveWidth, type Align, type MediaWidth } from '@/components/mdx/embeds/layout'
+import { useEffect, useRef } from 'react';
+import { loadEmbedScript, reprocessEmbedScript } from '@/components/mdx/embeds/loadEmbedScript';
+import {
+	justifyClassName,
+	resolveWidth,
+	type Align,
+	type MediaWidth,
+} from '@/components/mdx/embeds/layout';
 
-const WIDGETS_SRC = 'https://embed.reddit.com/widgets.js'
+const WIDGETS_SRC = 'https://embed.reddit.com/widgets.js';
 
 interface RedditProps {
 	/** Subreddit without r/, e.g. "programming" */
-	subreddit: string
+	subreddit: string;
 	/** Numeric post ID from the URL */
-	postId: string
-	title: string
-	author: string
-	caption?: string
-	width?: MediaWidth
-	align?: Align
-	theme?: 'light' | 'dark'
+	postId: string;
+	title: string;
+	author: string;
+	caption?: string;
+	width?: MediaWidth;
+	align?: Align;
+	theme?: 'light' | 'dark';
 	/** Embed card height in px. Reddit renders a fixed-height iframe. */
-	height?: number
+	height?: number;
 }
 
 export function Reddit({
@@ -30,24 +35,24 @@ export function Reddit({
 	theme = 'dark',
 	height = 500,
 }: RedditProps) {
-	const containerRef = useRef<HTMLDivElement>(null)
+	const containerRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		let cancelled = false
+		let cancelled = false;
 		loadEmbedScript(WIDGETS_SRC).then(() => {
 			// Reddit's script has no manual re-scan API, so re-inserting it is the
 			// documented workaround to process blockquotes added after initial load.
-			if (!cancelled) reprocessEmbedScript(WIDGETS_SRC)
-		})
+			if (!cancelled) reprocessEmbedScript(WIDGETS_SRC);
+		});
 		return () => {
-			cancelled = true
-		}
-	}, [subreddit, postId, theme])
+			cancelled = true;
+		};
+	}, [subreddit, postId, theme]);
 
-	const postUrl = `https://www.reddit.com/r/${subreddit}/comments/${postId}/`
-	const userUrl = `https://www.reddit.com/user/${author}/`
-	const subredditUrl = `https://www.reddit.com/r/${subreddit}/`
-	const { className, style } = resolveWidth(width)
+	const postUrl = `https://www.reddit.com/r/${subreddit}/comments/${postId}/`;
+	const userUrl = `https://www.reddit.com/user/${author}/`;
+	const subredditUrl = `https://www.reddit.com/r/${subreddit}/`;
+	const { className, style } = resolveWidth(width);
 
 	return (
 		<figure className="my-8">
@@ -71,5 +76,5 @@ export function Reddit({
 				</figcaption>
 			) : null}
 		</figure>
-	)
+	);
 }

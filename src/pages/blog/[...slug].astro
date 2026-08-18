@@ -45,11 +45,13 @@ const mdxComponents = {
 				<header class="border-border mb-10 border-b pb-8">
 					<div class="flex flex-wrap items-center gap-3">
 						<p class="text-primary text-sm font-semibold tracking-[0.2em] uppercase">Blog post</p>
-						{post.data.draft ? (
-							<span class="border-primary/40 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-xs font-semibold tracking-wide uppercase">
-								Draft
-							</span>
-						) : null}
+						{
+							post.data.draft ? (
+								<span class="border-primary/40 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-xs font-semibold tracking-wide uppercase">
+									Draft
+								</span>
+							) : null
+						}
 					</div>
 					<h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
 						{post.data.title}

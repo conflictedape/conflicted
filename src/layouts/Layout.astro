@@ -1,4 +1,5 @@
 ---
+import ImageLightbox from '@/components/ImageLightbox';
 import Navbar from '@/components/Navbar';
 import { SITE_URL } from '@/lib/constants';
 import '@/styles/globals.css';
@@ -16,7 +17,10 @@ const {
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL(SITE_URL);
-const ogImageUrl = new URL(ogImage ?? `${import.meta.env.BASE_URL}og-default.png`, siteUrl).toString();
+const ogImageUrl = new URL(
+	ogImage ?? `${import.meta.env.BASE_URL}og-default.png`,
+	siteUrl
+).toString();
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 ---
 
@@ -62,5 +66,6 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 	<body>
 		<Navbar client:load />
 		<slot />
+		<ImageLightbox client:load />
 	</body>
 </html>

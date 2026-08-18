@@ -32,7 +32,10 @@ export default function Navbar() {
 	return (
 		<header className="border-border bg-background/80 sticky top-0 z-50 w-full border-b backdrop-blur-sm">
 			<nav className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-				<a href="/" className="text-primary font-mono text-lg font-bold tracking-tight">
+				<a
+					href={import.meta.env.BASE_URL}
+					className="text-primary font-mono text-lg font-bold tracking-tight"
+				>
 					Conflictedape<span className="text-foreground">.</span>
 				</a>
 

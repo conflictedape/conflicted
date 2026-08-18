@@ -1,5 +1,5 @@
 interface SpacerProps {
-	size?: 'sm' | 'md' | 'lg' | 'xl'
+	size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const sizeMap: Record<NonNullable<SpacerProps['size']>, string> = {
@@ -7,8 +7,8 @@ const sizeMap: Record<NonNullable<SpacerProps['size']>, string> = {
 	md: 'h-16',
 	lg: 'h-24',
 	xl: 'h-32',
-}
+};
 
 export function Spacer({ size = 'lg' }: SpacerProps) {
-	return <div className={sizeMap[size]} aria-hidden="true" />
+	return <div className={sizeMap[size]} aria-hidden="true" />;
 }

@@ -1,63 +1,66 @@
-import { useState } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 
-type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
 interface JsonViewerProps {
-	data: JsonValue
+	data: JsonValue;
 	/** Root nodes expanded on first render; deeper levels start collapsed. */
-	defaultExpandDepth?: number
-	caption?: string
+	defaultExpandDepth?: number;
+	caption?: string;
 }
 
 function isExpandable(value: JsonValue): value is JsonValue[] | { [key: string]: JsonValue } {
-	return typeof value === 'object' && value !== null
+	return typeof value === 'object' && value !== null;
 }
 
 function typeSummary(value: JsonValue): string {
-	if (Array.isArray(value)) return `Array(${value.length})`
-	if (value === null) return 'null'
-	if (typeof value === 'object') return `Object(${Object.keys(value).length})`
-	return typeof value
+	if (Array.isArray(value)) return `Array(${value.length})`;
+	if (value === null) return 'null';
+	if (typeof value === 'object') return `Object(${Object.keys(value).length})`;
+	return typeof value;
 }
 
 function ValuePreview({ value }: { value: JsonValue }) {
-	if (value === null) return <span className="text-muted-foreground">null</span>
-	if (typeof value === 'string') return <span className="text-chart-3">&quot;{value}&quot;</span>
-	if (typeof value === 'boolean') return <span className="text-primary">{String(value)}</span>
-	if (typeof value === 'number') return <span className="text-secondary">{value}</span>
-	return <span className="text-muted-foreground">{typeSummary(value)}</span>
+	if (value === null) return <span className="text-muted-foreground">null</span>;
+	if (typeof value === 'string') return <span className="text-chart-3">&quot;{value}&quot;</span>;
+	if (typeof value === 'boolean') return <span className="text-primary">{String(value)}</span>;
+	if (typeof value === 'number') return <span className="text-secondary">{value}</span>;
+	return <span className="text-muted-foreground">{typeSummary(value)}</span>;
 }
 
 interface NodeProps {
-	label: string
-	value: JsonValue
-	depth: number
-	defaultExpandDepth: number
-	isLast: boolean
-	hideLabel?: boolean
+	label: string;
+	value: JsonValue;
+	depth: number;
+	defaultExpandDepth: number;
+	isLast: boolean;
+	hideLabel?: boolean;
 }
 
 function JsonNode({ label, value, depth, defaultExpandDepth, isLast, hideLabel }: NodeProps) {
-	const expandable = isExpandable(value)
-	const [expanded, setExpanded] = useState(depth < defaultExpandDepth)
+	const expandable = isExpandable(value);
+	const [expanded, setExpanded] = useState(depth < defaultExpandDepth);
 
 	if (!expandable) {
 		return (
-			<div className="hover:bg-muted/40 flex items-start gap-1 px-2 py-0.5" style={{ paddingLeft: depth * 16 + 8 }}>
+			<div
+				className="hover:bg-muted/40 flex items-start gap-1 px-2 py-0.5"
+				style={{ paddingLeft: depth * 16 + 8 }}
+			>
 				{!hideLabel ? <span className="text-foreground shrink-0">{label}:</span> : null}
 				<span>
 					<ValuePreview value={value} />
 					{!isLast ? <span className="text-muted-foreground">,</span> : null}
 				</span>
 			</div>
-		)
+		);
 	}
 
 	const entries = Array.isArray(value)
 		? value.map((v, i) => [String(i), v] as const)
-		: Object.entries(value)
-	const bracket = Array.isArray(value) ? ['[', ']'] : ['{', '}']
+		: Object.entries(value);
+	const bracket = Array.isArray(value) ? ['[', ']'] : ['{', '}'];
 
 	return (
 		<div>
@@ -104,7 +107,7 @@ function JsonNode({ label, value, depth, defaultExpandDepth, isLast, hideLabel }
 				</div>
 			) : null}
 		</div>
-	)
+	);
 }
 
 export function JsonViewer({ data, defaultExpandDepth = 1, caption }: JsonViewerProps) {
@@ -126,5 +129,5 @@ export function JsonViewer({ data, defaultExpandDepth = 1, caption }: JsonViewer
 				</figcaption>
 			) : null}
 		</figure>
-	)
+	);
 }
