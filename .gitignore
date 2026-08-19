@@ -21,6 +21,10 @@ tasks.txt
 .env.*
 !.env.example
 
+# synced data (regenerated at build time, see scripts/sync)
+src/data/liked-songs.json
+src/data/rated-games.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
