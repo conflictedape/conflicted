@@ -13,14 +13,19 @@ const stats = [
 	{ value: String(posts.length), label: 'articles written' },
 	{ value: String(PROJECTS.length), label: 'open source projects' },
 ];
+const hide_stats = true;
 ---
 
-<div class="border-border flex flex-wrap gap-x-10 gap-y-4 border-y py-6">
-	{
-		stats.map((stat) => (
-			<p class="text-muted-foreground text-sm">
-				<span class="text-foreground font-bold">{stat.value}</span> {stat.label}
-			</p>
-		))
-	}
-</div>
+{
+	hide_stats ? (
+		<Fragment />
+	) : (
+		<div class="border-border flex flex-wrap gap-x-10 gap-y-4 border-y py-6">
+			{stats.map((stat) => (
+				<p class="text-muted-foreground text-sm">
+					<span class="text-foreground font-bold">{stat.value}</span> {stat.label}
+				</p>
+			))}
+		</div>
+	)
+}

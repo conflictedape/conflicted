@@ -23,7 +23,7 @@ export const PROFILE = {
 	socialLinks: [
 		{ label: 'GitHub', href: 'https://github.com/conflictedape', icon: 'github' },
 		{ label: 'X', href: 'https://x.com/conflictedape', icon: 'x' },
-		{ label: 'Email', href: 'mailto:hello@conflictedape.dev', icon: 'mail' },
+		{ label: 'Email', href: 'mailto:conflictedapestudios@gmail.com', icon: 'mail' },
 	] satisfies SocialLink[],
 	skills: [
 		'Rust',
@@ -37,7 +37,7 @@ export const PROFILE = {
 		'GCP',
 	],
 	stats: {
-		yearsExperience: 5,
-		githubStars: '1k+',
+		yearsExperience: 4,
+		githubStars: '',
 	},
 };
