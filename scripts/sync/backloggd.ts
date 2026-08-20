@@ -14,9 +14,12 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
+import type { AnyNode } from 'domhandler';
+import { groupByRecency } from '../../src/lib/recency.ts';
 
 const OUTPUT_PATH = path.join(import.meta.dirname, '../../src/data/rated-games.json');
 const USER_AGENT = 'Mozilla/5.0 (compatible; portfolio-sync-bot/1.0)';
+const RESULT_LIMIT = 20;
 
 export interface RatedGame {
 	reviewId: string;
@@ -39,7 +42,7 @@ function requireEnv(name: string): string {
 	return value;
 }
 
-function parseRating($card: cheerio.Cheerio<unknown>): number | null {
+function parseRating($card: cheerio.Cheerio<AnyNode>): number | null {
 	const style = $card.find('.stars-top').attr('style');
 	const match = style?.match(/width:\s*(\d+(?:\.\d+)?)%/);
 	if (!match?.[1]) return null;
@@ -49,7 +52,7 @@ function parseRating($card: cheerio.Cheerio<unknown>): number | null {
 
 async function fetchReviewsPage(
 	profileId: string,
-	page: number,
+	page: number
 ): Promise<{ games: RatedGame[]; hasNextPage: boolean }> {
 	const url = `https://backloggd.com/u/${profileId}/reviews?page=${page}`;
 	const response = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
@@ -120,13 +123,18 @@ async function main() {
 	console.log(`Fetching rated games for Backloggd profile "${profileId}"...`);
 	const games = await fetchAllRatedGames(profileId);
 
+	const groups = groupByRecency(games, (game) => game.ratedAt, { limit: RESULT_LIMIT });
+	const total = groups.reduce((sum, group) => sum + group.items.length, 0);
+
 	await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
 	await writeFile(
 		OUTPUT_PATH,
-		JSON.stringify({ syncedAt: new Date().toISOString(), games }, null, 2),
+		JSON.stringify({ syncedAt: new Date().toISOString(), groups }, null, 2)
 	);
 
-	console.log(`Wrote ${games.length} rated games to ${OUTPUT_PATH}`);
+	console.log(
+		`Wrote ${total} rated games (of ${games.length} total) across ${groups.length} groups to ${OUTPUT_PATH}`
+	);
 }
 
 main().catch((error: unknown) => {

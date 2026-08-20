@@ -10,10 +10,12 @@
  */
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { groupByRecency } from '../../src/lib/recency.ts';
 
 const TOKEN_URL = 'https://accounts.spotify.com/api/token';
 const LIKED_TRACKS_URL = 'https://api.spotify.com/v1/me/tracks';
 const PAGE_SIZE = 50;
+const RESULT_LIMIT = 50;
 const OUTPUT_PATH = path.join(import.meta.dirname, '../../src/data/liked-songs.json');
 
 interface SpotifyImage {
@@ -81,7 +83,7 @@ async function getAccessToken(): Promise<string> {
 		throw new Error(
 			`Failed to refresh Spotify access token (${response.status}): ${body}\n` +
 				'The refresh token may have expired (Spotify refresh tokens expire 180 days ' +
-				'after authorization) — re-run the manual auth flow to generate a new one.',
+				'after authorization) — re-run the manual auth flow to generate a new one.'
 		);
 	}
 
@@ -130,13 +132,18 @@ async function main() {
 	console.log('Fetching liked songs...');
 	const songs = await fetchAllLikedSongs(accessToken);
 
+	const groups = groupByRecency(songs, (song) => song.addedAt, { limit: RESULT_LIMIT });
+	const total = groups.reduce((sum, group) => sum + group.items.length, 0);
+
 	await mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
 	await writeFile(
 		OUTPUT_PATH,
-		JSON.stringify({ syncedAt: new Date().toISOString(), songs }, null, 2),
+		JSON.stringify({ syncedAt: new Date().toISOString(), groups }, null, 2)
 	);
 
-	console.log(`Wrote ${songs.length} liked songs to ${OUTPUT_PATH}`);
+	console.log(
+		`Wrote ${total} liked songs (of ${songs.length} total) across ${groups.length} groups to ${OUTPUT_PATH}`
+	);
 }
 
 main().catch((error: unknown) => {
