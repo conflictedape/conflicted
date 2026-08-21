@@ -18,14 +18,14 @@ interface GroupByRecencyOptions {
 }
 
 /**
- * Buckets a list of dated items into recency groups — "This week", "Earlier
+ * Buckets a list of dated items into recency groups — "Last week", "Earlier
  * this month", "N months ago" (1-11), then "N years ago" thereafter —
  * keeping only the most recent `limit` items (if provided) before bucketing.
  *
  * Buckets are mutually exclusive (an item from this week is never also
  * counted in "Earlier this month"), which is why that bucket is named
  * "Earlier this month" rather than "This month" — it only holds the
- * remainder of the month not already covered by "This week".
+ * remainder of the month not already covered by "Last week".
  *
  * Groups with no items are omitted entirely, and the returned groups are
  * ordered from most to least recent. Weeks are calendar weeks starting on
@@ -67,7 +67,7 @@ function toDate(value: string | Date): Date {
 
 function classify(date: Date, now: Date): { label: string; order: number } {
 	if (isSameWeek(date, now, { weekStartsOn: 1 })) {
-		return { label: 'This week', order: 0 };
+		return { label: 'Last week', order: 0 };
 	}
 
 	if (isSameMonth(date, now)) {

@@ -1,31 +1,59 @@
 ---
-import { Music } from 'lucide-react';
+import { Headphones } from 'lucide-react';
 
-import { TRACKS } from '@/data/tracks';
+import { LIKED_SONG_GROUPS } from '@/data/tracks';
+
+const hasTracks = LIKED_SONG_GROUPS.some((group) => group.items.length > 0);
 ---
 
 {
-	TRACKS.length > 0 && (
+	hasTracks && (
 		<aside class="border-border bg-card/60 border p-5">
-			<p class="text-muted-foreground mb-4 flex items-center gap-2 text-sm font-semibold tracking-[0.2em] uppercase">
-				<Music className="h-4 w-4" />
+			<p class="text-muted-foreground mb-4 flex items-center gap-2 text-sm font-semibold tracking-[0.18em] uppercase">
+				<Headphones className="h-4 w-4" />
 				Liked tracks
 			</p>
-			<ul class="space-y-4">
-				{TRACKS.map((track) => (
-					<li class="flex items-center gap-3">
-						<span class="bg-muted border-border flex h-10 w-10 shrink-0 items-center justify-center border">
-							<Music className="text-muted-foreground h-4 w-4" />
-						</span>
-						<span class="min-w-0">
-							<span class="text-foreground block truncate text-sm font-semibold">
-								{track.title}
-							</span>
-							<span class="text-muted-foreground block truncate text-xs">{track.artist}</span>
-						</span>
-					</li>
+			<div class="space-y-5">
+				{LIKED_SONG_GROUPS.map((group) => (
+					<div>
+						<p class="text-muted-foreground mb-2 text-xs font-semibold uppercase">{group.label}</p>
+						<ul class="space-y-4">
+							{group.items.map((track) => (
+								<li>
+									<a
+										class="group flex items-center gap-3"
+										href={track.url}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{track.coverUrl ? (
+											<img
+												class="border-border h-10 w-10 shrink-0 border object-cover"
+												src={track.coverUrl}
+												alt={track.album}
+												width={40}
+												height={40}
+											/>
+										) : (
+											<span class="bg-muted border-border flex h-10 w-10 shrink-0 items-center justify-center border">
+												<Headphones className="text-muted-foreground h-4 w-4" />
+											</span>
+										)}
+										<span class="min-w-0">
+											<span class="text-foreground group-hover:text-primary block truncate text-sm font-semibold">
+												{track.title}
+											</span>
+											<span class="text-muted-foreground block truncate text-xs">
+												{track.artist}
+											</span>
+										</span>
+									</a>
+								</li>
+							))}
+						</ul>
+					</div>
 				))}
-			</ul>
+			</div>
 		</aside>
 	)
 }
