@@ -15,8 +15,23 @@ import { groupByRecency } from '../../src/lib/recency.ts';
 const TOKEN_URL = 'https://accounts.spotify.com/api/token';
 const LIKED_TRACKS_URL = 'https://api.spotify.com/v1/me/tracks';
 const PAGE_SIZE = 50;
-const RESULT_LIMIT = 50;
+const RESULT_LIMIT = 10;
 const OUTPUT_PATH = path.join(import.meta.dirname, '../../src/data/liked-songs.json');
+
+/**
+ * Shape of a liked song as written to src/data/liked-songs.json. This is the
+ * source of truth for the type — src/data/tracks.ts imports it directly
+ * (type-only, erased at build time) instead of duplicating it.
+ */
+export interface LikedSong {
+	id: string;
+	title: string;
+	artist: string;
+	album: string;
+	coverUrl: string | null;
+	url: string;
+	addedAt: string;
+}
 
 interface SpotifyImage {
 	url: string;
@@ -41,16 +56,6 @@ interface SavedTracksPage {
 	items: SavedTrackItem[];
 	next: string | null;
 	total: number;
-}
-
-export interface LikedSong {
-	id: string;
-	title: string;
-	artist: string;
-	album: string;
-	coverUrl: string | null;
-	url: string;
-	addedAt: string;
 }
 
 function requireEnv(name: string): string {

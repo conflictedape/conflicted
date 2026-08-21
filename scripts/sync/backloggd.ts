@@ -5,11 +5,15 @@
  * (no headless browser needed), unlike some other Backloggd routes (e.g.
  * /games/) which are placed behind an anti-scraping JS challenge.
  *
+ * IMPORTANT NOTE to SELF: This will only fetch the games that are rated and have some sort of text in the review field.
+ * So, Add some text to the review fields when rating a game to show up. ;)
+ *
  * The reviews tab is already sorted "Recent" (most recently rated/reviewed
  * first) by default, which matches what we want for a "recently rated" feed.
  *
  * Required env var: BACKLOGGD_PROFILE_ID
  * Run locally with:  node --env-file=.env scripts/sync/backloggd.ts
+ *
  */
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -19,7 +23,7 @@ import { groupByRecency } from '../../src/lib/recency.ts';
 
 const OUTPUT_PATH = path.join(import.meta.dirname, '../../src/data/rated-games.json');
 const USER_AGENT = 'Mozilla/5.0 (compatible; portfolio-sync-bot/1.0)';
-const RESULT_LIMIT = 20;
+const RESULT_LIMIT = 10;
 
 export interface RatedGame {
 	reviewId: string;

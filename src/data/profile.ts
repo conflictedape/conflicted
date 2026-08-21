@@ -6,16 +6,17 @@ export interface SocialLink {
 
 export const PROFILE = {
 	name: 'Conflicted Ape',
-	tagline: 'Backend engineer, game-dev, occasional game-dev nerd.',
+	tagline: 'Probably wrong, writing anyway',
 	bio: [
-		"I love making ideas come to life with code. I'm a fan of computer architecture, scaling systems, and game dev.",
-		"I've worked on various backend systems across a handful of small teams and side projects. You can find me sharing what I learn along the way, and personal rants ofc on this blog.",
+		"Software engineer in India, mostly interested in system design, scaling things, and game dev. I rant here. I'm planning to post a lot of tech stuff too.",
+		"I write about things that I've read, watched, or experienced first-hand. I might be wrong about things, my views might change as I grow older, or they won't.",
+		"Read what interests you. If you want to argue, or rant back, I'm around.",
 	],
 	availabilityPrefix: 'Currently open to',
-	availabilityHighlight: 'backend and full-stack roles',
-	location: 'India',
+	availabilityHighlight: 'backend roles',
+	location: 'Hyderabad, India',
 	photo: {
-		/** No real photo yet — Hero.astro renders a square placeholder box (initials) instead of an <img>. */
+		src: '/conflicted_ape.webp',
 		placeholderInitials: 'CA',
 		alt: 'Conflicted Ape',
 		caption: "yeah, that's me..",
