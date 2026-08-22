@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { withBase } from '@/lib/constants';
 
 export default function Navbar() {
 	const [dark, setDark] = useState(() => {
@@ -27,10 +28,7 @@ export default function Navbar() {
 	return (
 		<header className="border-border bg-background/80 sticky top-0 z-50 w-full border-b backdrop-blur-sm">
 			<nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-				<a
-					href={import.meta.env.BASE_URL}
-					className="text-primary font-mono text-lg font-bold tracking-tight"
-				>
+				<a href={withBase('')} className="text-primary font-mono text-lg font-bold tracking-tight">
 					Conflictedape<span className="text-foreground">.</span>
 				</a>
 

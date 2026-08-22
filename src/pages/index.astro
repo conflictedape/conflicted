@@ -8,7 +8,7 @@ import LikedTracks from '@/components/home/LikedTracks.astro';
 import Stats from '@/components/home/Stats.astro';
 import { PROJECTS } from '@/data/projects';
 import Layout from '@/layouts/Layout.astro';
-import { IS_DEV } from '@/lib/constants';
+import { IS_DEV, withBase } from '@/lib/constants';
 import { takeLatest } from '@/lib/home';
 
 const rawPosts = (await getCollection('blog', ({ data }) => IS_DEV || !data.draft)).sort(
@@ -21,7 +21,7 @@ const articles = latestPosts.map((post) => {
 	const slug = post.id.replace(/\/index$/, '');
 	return {
 		title: post.data.title,
-		href: `${import.meta.env.BASE_URL}blog/${slug}/`,
+		href: withBase(`blog/${slug}/`),
 		date: format(post.data.publishDate, 'MMMM d, yyyy'),
 		excerpt: post.data.description,
 	};
