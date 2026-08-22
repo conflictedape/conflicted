@@ -4,6 +4,7 @@ import { Mail, MoveDownLeft } from 'lucide-react';
 import { GithubIcon } from '@/components/icons/GithubIcon';
 import { XIcon } from '@/components/icons/XIcon';
 import { PROFILE } from '@/data/profile';
+import { withBase } from '@/lib/constants';
 
 const iconFor = { github: GithubIcon, x: XIcon, mail: Mail } as const;
 ---
@@ -64,7 +65,7 @@ const iconFor = { github: GithubIcon, x: XIcon, mail: Mail } as const;
 		{
 			PROFILE.photo.src ? (
 				<img
-					src={PROFILE.photo.src}
+					src={withBase(PROFILE.photo.src)}
 					alt={PROFILE.photo.alt}
 					class="border-border h-[390px] w-[390px] rounded-xl border object-cover"
 					width="390"

@@ -1,7 +1,7 @@
 ---
 import ImageLightbox from '@/components/ImageLightbox';
 import Navbar from '@/components/Navbar';
-import { SITE_URL } from '@/lib/constants';
+import { SITE_URL, withBase } from '@/lib/constants';
 import '@/styles/globals.css';
 
 interface Props {
@@ -17,10 +17,7 @@ const {
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL(SITE_URL);
-const ogImageUrl = new URL(
-	ogImage ?? `${import.meta.env.BASE_URL}og-default.png`,
-	siteUrl
-).toString();
+const ogImageUrl = new URL(withBase(ogImage ?? 'og-default.png'), siteUrl).toString();
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 ---
 

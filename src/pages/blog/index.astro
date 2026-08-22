@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 
 import Layout from '@/layouts/Layout.astro';
-import { IS_DEV } from '@/lib/constants';
+import { IS_DEV, withBase } from '@/lib/constants';
 
 const getPostSlug = (post: CollectionEntry<'blog'>) => post.id.replace(/\/index$/, '');
 
@@ -51,7 +51,7 @@ const posts = await Promise.all(
 									</div>
 									<h2 class="text-2xl font-semibold tracking-tight">
 										<a
-											href={`${import.meta.env.BASE_URL}blog/${postSlug}/`}
+											href={withBase(`blog/${postSlug}/`)}
 											class="hover:text-primary transition-colors"
 										>
 											{post.data.title}

@@ -21,6 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BASE_PATH: /conflicted
+      # Secrets used by scripts/sync/spotify.ts and scripts/sync/backloggd.ts.
+      # Set these under repo Settings > Secrets and variables > Actions.
+      SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+      SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+      SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+      BACKLOGGD_PROFILE_ID: ${{ secrets.BACKLOGGD_PROFILE_ID }}
 
     steps:
       - name: Checkout
@@ -31,6 +37,9 @@ jobs:
         with:
           node-version: 24
           package-manager: pnpm@10
+          # Installs deps, then syncs Spotify/Backloggd data into src/data
+          # before `astro build` so it's baked into the static output.
+          build-cmd: pnpm run sync && pnpm run build
 
   deploy:
     name: Deploy
