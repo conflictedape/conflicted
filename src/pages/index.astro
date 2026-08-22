@@ -6,6 +6,7 @@ import ContentTabs from '@/components/home/ContentTabs';
 import Hero from '@/components/home/Hero.astro';
 import LikedTracks from '@/components/home/LikedTracks.astro';
 import Stats from '@/components/home/Stats.astro';
+import { RATED_GAME_GROUPS } from '@/data/games';
 import { PROJECTS } from '@/data/projects';
 import Layout from '@/layouts/Layout.astro';
 import { IS_DEV } from '@/lib/constants';
@@ -33,6 +34,16 @@ const projects = takeLatest(PROJECTS, 10).map((project) => ({
 	date: format(new Date(project.date), 'MMMM d, yyyy'),
 	excerpt: project.excerpt,
 }));
+
+const ratedGames = takeLatest(
+	RATED_GAME_GROUPS.flatMap((group) => group.items),
+	10
+).map((game) => ({
+	title: game.title,
+	url: game.url,
+	coverUrl: game.coverUrl,
+	rating: game.rating,
+}));
 ---
 
 <Layout>
@@ -42,7 +53,7 @@ const projects = takeLatest(PROJECTS, 10).map((project) => ({
 
 		<div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
 			<div class="min-w-0">
-				<ContentTabs client:load articles={articles} projects={projects} />
+				<ContentTabs client:load articles={articles} projects={projects} games={ratedGames} />
 			</div>
 			<LikedTracks />
 		</div>

@@ -1,25 +1,19 @@
-import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
+/**
+ * Which icon is visible is decided purely by CSS (the `dark:` variant),
+ * keyed off the `.dark` class that `Layout.astro`'s blocking inline script
+ * already applies to `<html>` before this component hydrates. Both icons
+ * are always rendered with static classNames, so the server and client
+ * markup for this component are byte-identical — there's no client-only
+ * state (localStorage/matchMedia) feeding into what gets rendered, so
+ * there's nothing for React to mismatch during hydration.
+ */
 export default function Navbar() {
-	const [dark, setDark] = useState(() => {
-		if (typeof localStorage === 'undefined') {
-			return true;
-		}
-
-		const stored = localStorage.getItem('theme');
-		return stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-	});
-
-	useEffect(() => {
-		document.documentElement.classList.toggle('dark', dark);
-	}, [dark]);
-
 	const toggleDark = () => {
-		const next = !dark;
-		setDark(next);
+		const next = !document.documentElement.classList.contains('dark');
 		document.documentElement.classList.toggle('dark', next);
 		localStorage.setItem('theme', next ? 'dark' : 'light');
 	};
@@ -41,7 +35,8 @@ export default function Navbar() {
 					aria-label="Toggle dark mode"
 					className="h-8 w-8"
 				>
-					{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+					<Sun className="hidden h-4 w-4 dark:block" />
+					<Moon className="block h-4 w-4 dark:hidden" />
 				</Button>
 			</nav>
 		</header>
