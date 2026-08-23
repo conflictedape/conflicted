@@ -37,8 +37,8 @@ export default function ImageLightbox() {
 			}}
 		>
 			<Dialog.Portal>
-				<Dialog.Backdrop className="data-closed:animate-out data-closed:fade-out-0 data-open:animate-in data-open:fade-in-0 fixed inset-0 z-[100] bg-black/85" />
-				<Dialog.Popup className="data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 fixed inset-0 z-[100] flex items-center justify-center p-4 outline-none">
+				<Dialog.Backdrop className="data-closed:animate-out data-closed:fade-out-0 data-open:animate-in data-open:fade-in-0 fixed inset-0 z-100 bg-black/85" />
+				<Dialog.Popup className="data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 fixed inset-0 z-100 flex items-center justify-center p-4 outline-none">
 					<Dialog.Close
 						aria-label="Close image viewer"
 						className="bg-background/80 text-foreground hover:bg-accent hover:text-accent-foreground fixed top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-none backdrop-blur-sm transition-colors outline-none"

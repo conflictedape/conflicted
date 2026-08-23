@@ -1,4 +1,10 @@
-export const SITE_URL = process.env.SITE_URL || 'https://conflictedape.dev';
+// `process` only exists in Node/SSR contexts (build time, astro.config.ts).
+// This module is also imported by client-hydrated React components (e.g.
+// Navbar.tsx, for `withBase`), where `process` is undefined — guard access
+// so importing this file never crashes client-side hydration.
+const env: Record<string, string | undefined> = typeof process !== 'undefined' ? process.env : {};
+
+export const SITE_URL = env.SITE_URL || 'https://conflictedape.dev';
 
 // Ensures a leading and trailing slash regardless of how BASE_PATH is..
 // consumer (Astro's `base` config, and in turn `import.meta.env.BASE_URL`)
@@ -14,7 +20,7 @@ function normalizeBasePath(path: string): string {
 // the single source of truth for the site's deployment sub-path, and is "/"
 // for deployments served from the domain root (e.g. a future Cloudflare
 // Pages deploy at conflictedape.dev).
-export const BASE_PATH = normalizeBasePath(process.env.BASE_PATH || '/');
+export const BASE_PATH = normalizeBasePath(env.BASE_PATH || '/');
 
 const ABSOLUTE_URL_RE = /^([a-z][a-z\d+.-]*:)?\/\//i;
 
