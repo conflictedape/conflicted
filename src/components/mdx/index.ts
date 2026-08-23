@@ -9,6 +9,7 @@ export { Pre } from '@/components/mdx/Pre';
 export { Table } from '@/components/mdx/Table';
 export { TOC } from '@/components/mdx/TOC';
 export { Video } from '@/components/mdx/Video';
+export { Word } from '@/components/mdx/Word';
 export { Reddit } from '@/components/mdx/embeds/Reddit';
 export { X } from '@/components/mdx/embeds/X';
 export { Spacer } from '@/components/mdx/Spacer';

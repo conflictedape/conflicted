@@ -19,9 +19,10 @@ import {
 	X,
 	Reddit,
 	JsonViewer,
+	Word,
 } from '@/components/mdx';
 
-A portfolio should feel personal, fast, and easy to evolve. I wanted a setup where writing a new post felt as simple as opening a folder, creating an `index.mdx` file, and shipping. Astro gave me the performance baseline, while MDX gave me the flexibility to mix content with small interactive components when a plain paragraph was not enough.
+A portfolio should feel personal, fast, and easy to evolve. I wanted a setup where writing a new post felt as simple as opening a folder, creating an `index.mdx` file, and shipping. Astro gave me the performance baseline, while MDX gave me the flexibility to mix content with small interactive components when a plain paragraph was not enough — the kind of setup that stays <Word phonetic="/juːˈbɪkwɪtəs/" meaning="Present, appearing, or found everywhere." client:load>ubiquitous</Word> across every post without extra effort.
 
 ## Why Astro and MDX fit together
 
@@ -480,5 +481,25 @@ If the system makes publishing easier next month than it was today, then it is d
 	}}
 	client:load
 />
+
+## Word tooltip showcase
+
+A small MDX component for inline vocabulary: a highlighted, dotted-underline word that reveals its definition (and, optionally, an illustrative image) in a tooltip on hover or keyboard focus. The phonetic spelling and the image are both optional and shown independently.
+
+### Meaning only (no phonetic, no image)
+
+The API stayed refreshingly <Word meaning="Simple in design; free of unnecessary complexity." client:load>minimal</Word> once the schema settled down.
+
+### With phonetic spelling
+
+Choosing <Word phonetic="/sɪˈnɒnɪməs/" meaning="Having the same or a similar meaning as another word or phrase." client:load>synonymous</Word> naming across the codebase made the components easier to discover.
+
+### With an illustrating image (no phonetic)
+
+Every layout on the site keeps a strict <Word meaning="A conceptual structure and framework intended to guide the development of something." image="https://picsum.photos/seed/blueprint/480/240" imageAlt="A blueprint sketch representing a design system" client:load>blueprint</Word> so new pages inherit consistent spacing and color.
+
+### With phonetic spelling and an image
+
+The whole system was built to feel <Word phonetic="/kəˈhɪrənt/" meaning="Logical and consistent; forming a unified whole." image="https://picsum.photos/seed/coherent/480/240" imageAlt="Abstract shapes fitting together to represent coherence" client:load>coherent</Word>, from the content schema down to the smallest MDX component.
 
 <Spacer size="xl" />
