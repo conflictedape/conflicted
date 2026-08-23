@@ -17,10 +17,11 @@ interface WordProps {
 
 export function Word({ children, phonetic, meaning, image, imageAlt }: WordProps) {
 	return (
-		<Tooltip delay={150}>
+		<Tooltip>
 			<TooltipTrigger
 				render={<span />}
 				tabIndex={0}
+				delay={150}
 				className="bg-primary/10 hover:bg-primary/20 decoration-primary/70 focus-visible:ring-ring/50 cursor-help rounded-sm px-1 py-0.5 underline decoration-dotted underline-offset-4 transition-colors outline-none focus-visible:ring-3"
 			>
 				{phonetic ? (

@@ -1,6 +1,7 @@
 ---
 import ImageLightbox from '@/components/ImageLightbox';
 import Navbar from '@/components/Navbar';
+import { PROFILE } from '@/data/profile';
 import { SITE_URL, withBase } from '@/lib/constants';
 import '@/styles/globals.css';
 
@@ -8,17 +9,36 @@ interface Props {
 	title?: string;
 	description?: string;
 	ogImage?: string;
+	/** extra schema.org objects (e.g. a per-page BlogPosting schema) rendered alongside the
+	 * base Person/WebSite schema that every page already gets. */
+	jsonLd?: Record<string, unknown>[];
 }
 
 const {
 	title = 'Conflicted Ape',
 	description = 'Portfolio, writing, and experiments by Conflicted Ape.',
 	ogImage,
+	jsonLd = [],
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL(SITE_URL);
 const ogImageUrl = new URL(withBase(ogImage ?? 'og-default.png'), siteUrl).toString();
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
+
+const personSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: PROFILE.name,
+	url: siteUrl.toString(),
+	sameAs: PROFILE.socialLinks.filter((link) => link.icon !== 'mail').map((link) => link.href),
+};
+const websiteSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebSite',
+	name: PROFILE.name,
+	url: siteUrl.toString(),
+};
+const schemas = [personSchema, websiteSchema, ...jsonLd];
 ---
 
 <!doctype html>
@@ -28,6 +48,10 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="description" content={description} />
 		<title>{title}</title>
+
+		<link rel="icon" type="image/png" sizes="32x32" href={withBase('favicon-32x32.png')} />
+		<link rel="icon" type="image/png" sizes="16x16" href={withBase('favicon-16x16.png')} />
+		<link rel="apple-touch-icon" sizes="180x180" href={withBase('apple-touch-icon.png')} />
 
 		<!-- Open Graph -->
 		<meta property="og:type" content="website" />
@@ -41,6 +65,13 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImageUrl} />
+
+		<!-- Structured data (schema.org) -->
+		{
+			schemas.map((schema) => (
+				<script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />
+			))
+		}
 
 		<script is:inline>
 			(function () {
