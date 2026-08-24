@@ -1,14 +1,18 @@
 ---
 import { format } from 'date-fns';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 
+import { ShareButtons } from '@/components/blog/ShareButtons';
 import { Callout, CodeBlock, Gif, Image, Pre, Table, TOC, Video, Youtube } from '@/components/mdx';
 import Layout from '@/layouts/Layout.astro';
-import { IS_DEV } from '@/lib/constants';
+import { IS_DEV, SITE_URL, withBase } from '@/lib/constants';
 
 interface Props {
 	post: CollectionEntry<'blog'>;
 }
+
+const getPostSlug = (post: CollectionEntry<'blog'>) => post.id.replace(/\/index$/, '');
 
 export async function getStaticPaths() {
 	const posts = await getCollection('blog', ({ data }) => IS_DEV || !data.draft);
@@ -32,62 +36,148 @@ const mdxComponents = {
 	pre: Pre,
 	table: Table,
 };
+
+// Older/newer neighbors, sorted the same way as the blog index (newest first).
+const allPosts = (await getCollection('blog', ({ data }) => IS_DEV || !data.draft)).sort(
+	(a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
+);
+const currentIndex = allPosts.findIndex((p) => p.id === post.id);
+const olderPost = currentIndex >= 0 ? allPosts[currentIndex + 1] : undefined;
+const newerPost = currentIndex > 0 ? allPosts[currentIndex - 1] : undefined;
+
+const siteUrl = Astro.site ?? new URL(SITE_URL);
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
+const imageUrl = new URL(withBase(post.data.image ?? 'og-default.png'), siteUrl).toString();
+
+const blogPostingSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: post.data.title,
+	description: post.data.description,
+	image: [imageUrl],
+	datePublished: post.data.publishDate.toISOString(),
+	dateModified: (post.data.updatedDate ?? post.data.publishDate).toISOString(),
+	author: { '@type': 'Person', name: post.data.author },
+	mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+};
 ---
 
 <Layout
 	title={post.data.title}
 	description={post.data.description}
 	{...post.data.image ? { ogImage: post.data.image } : {}}
+	jsonLd={[blogPostingSchema]}
 >
-	<main class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-		<div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
-			<article class="min-w-0">
-				<header class="border-border mb-10 border-b pb-8">
-					<div class="flex flex-wrap items-center gap-3">
-						<p class="text-primary text-sm font-semibold tracking-[0.2em] uppercase">Blog post</p>
+	<main class="mx-auto max-w-7xl">
+		<div class="px-4 sm:px-6 lg:px-8">
+			{
+				post.data.image ? (
+					<img
+						src={withBase(post.data.image)}
+						alt={post.data.title}
+						class="mb-10 aspect-[3/1] w-full object-cover"
+						loading="eager"
+					/>
+				) : null
+			}
+			<div class="grid gap-12 pb-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
+				<article class="min-w-0">
+					<header class="border-border mb-10 border-b pb-8">
+						<div class="flex flex-wrap items-center justify-between gap-3">
+							<div class="flex flex-wrap items-center gap-3">
+								<p class="text-primary text-sm font-semibold tracking-[0.2em] uppercase">
+									Blog post
+								</p>
+								{
+									post.data.draft ? (
+										<span class="border-primary/40 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-xs font-semibold tracking-wide uppercase">
+											Draft
+										</span>
+									) : null
+								}
+							</div>
+							<ShareButtons title={post.data.title} client:load />
+						</div>
+						<h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+							{post.data.title}
+						</h1>
+						<p class="text-muted-foreground mt-4 max-w-3xl text-base leading-7 sm:text-lg">
+							{post.data.description}
+						</p>
+						<div
+							class="text-muted-foreground mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm"
+						>
+							<span>{format(post.data.publishDate, 'MMMM d, yyyy')}</span>
+							<span>·</span>
+							<span>{readingTime}</span>
+							<span>·</span>
+							<span>{post.data.author}</span>
+						</div>
 						{
-							post.data.draft ? (
-								<span class="border-primary/40 bg-primary/10 text-primary rounded-full border px-2 py-0.5 text-xs font-semibold tracking-wide uppercase">
-									Draft
-								</span>
+							post.data.tags.length ? (
+								<ul class="mt-5 flex flex-wrap gap-2">
+									{post.data.tags.map((tag) => (
+										<li class="border-border text-muted-foreground border px-2.5 py-1 text-xs">
+											{tag}
+										</li>
+									))}
+								</ul>
+							) : null
+						}
+					</header>
+
+					<div class="mdx-content max-w-3xl min-w-0">
+						<Content components={mdxComponents} />
+					</div>
+
+					<div class="max-w-3xl">
+						{
+							olderPost || newerPost ? (
+								<nav
+									class="border-border mt-10 grid grid-cols-1 gap-4 border-t pt-8 sm:grid-cols-2"
+									aria-label="More posts"
+								>
+									<div class="sm:text-left">
+										{olderPost ? (
+											<a
+												href={withBase(`blog/${getPostSlug(olderPost)}/`)}
+												class="group text-muted-foreground hover:text-primary flex flex-col gap-1 transition-colors"
+											>
+												<span class="flex items-center gap-1 text-xs font-semibold tracking-wide uppercase">
+													<ArrowLeft className="h-3.5 w-3.5" />
+													Older post
+												</span>
+												<span class="text-foreground text-sm font-medium group-hover:text-inherit">
+													{olderPost.data.title}
+												</span>
+											</a>
+										) : null}
+									</div>
+									<div class="sm:text-right">
+										{newerPost ? (
+											<a
+												href={withBase(`blog/${getPostSlug(newerPost)}/`)}
+												class="group text-muted-foreground hover:text-primary flex flex-col gap-1 transition-colors sm:items-end"
+											>
+												<span class="flex items-center gap-1 text-xs font-semibold tracking-wide uppercase">
+													Newer post
+													<ArrowRight className="h-3.5 w-3.5" />
+												</span>
+												<span class="text-foreground text-sm font-medium group-hover:text-inherit">
+													{newerPost.data.title}
+												</span>
+											</a>
+										) : null}
+									</div>
+								</nav>
 							) : null
 						}
 					</div>
-					<h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-						{post.data.title}
-					</h1>
-					<p class="text-muted-foreground mt-4 max-w-3xl text-base leading-7 sm:text-lg">
-						{post.data.description}
-					</p>
-					<div
-						class="text-muted-foreground mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm"
-					>
-						<span>{format(post.data.publishDate, 'MMMM d, yyyy')}</span>
-						<span>·</span>
-						<span>{readingTime}</span>
-						<span>·</span>
-						<span>{post.data.author}</span>
-					</div>
-					{
-						post.data.tags.length ? (
-							<ul class="mt-5 flex flex-wrap gap-2">
-								{post.data.tags.map((tag) => (
-									<li class="border-border text-muted-foreground border px-2.5 py-1 text-xs">
-										#{tag}
-									</li>
-								))}
-							</ul>
-						) : null
-					}
-				</header>
+				</article>
 
-				<div class="mdx-content max-w-3xl min-w-0">
-					<Content components={mdxComponents} />
+				<div class="hidden lg:block">
+					<TOC client:load headings={headings} />
 				</div>
-			</article>
-
-			<div class="hidden lg:block">
-				<TOC client:load headings={headings} />
 			</div>
 		</div>
 	</main>
