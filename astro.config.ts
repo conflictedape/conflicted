@@ -32,7 +32,7 @@ export default defineConfig({
 				light: 'solarized-light',
 				dark: 'dark-plus',
 			},
-			wrap: true,
+			wrap: false,
 			// @ts-expect-error
 			langs: ['ts', 'js', 'rust', 'python'],
 			transformers: [

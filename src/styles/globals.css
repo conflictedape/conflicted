@@ -386,8 +386,7 @@ html.dark .mdx-content pre span:not(.line) {
 	}
 
 	.mdx-content pre {
-		@apply bg-card overflow-hidden rounded-xl p-4 text-sm;
-		word-break: break-word;
+		@apply bg-card overflow-x-auto rounded-xl p-4 text-sm;
 		line-height: 1.5;
 	}
 

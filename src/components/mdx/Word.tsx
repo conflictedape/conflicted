@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
 
@@ -16,12 +17,35 @@ interface WordProps {
 }
 
 export function Word({ children, phonetic, meaning, image, imageAlt }: WordProps) {
+	// Base UI's tooltip hover interaction is mouse-only, so touch devices (mobile/tablet)
+	// have no way to trigger it by hovering. Making the tooltip controlled lets us also
+	// open/close it on tap. Touch browsers still synthesize compatibility mouse events
+	// after a tap (mouseover/mouseout), which would otherwise immediately re-close a
+	// tap-opened tooltip via the same hover logic — so on coarse/no-hover devices we
+	// ignore hover-driven changes entirely and let taps be the only way to toggle it.
+	const [open, setOpen] = useState(false);
+	const canHoverRef = useRef(true);
+
+	useEffect(() => {
+		canHoverRef.current = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+	}, []);
+
 	return (
-		<Tooltip>
+		<Tooltip
+			open={open}
+			onOpenChange={(next, eventDetails) => {
+				if (!canHoverRef.current && eventDetails?.reason === 'trigger-hover') return;
+				setOpen(next);
+			}}
+		>
 			<TooltipTrigger
 				render={<span />}
 				tabIndex={0}
 				delay={150}
+				closeOnClick={false}
+				onClick={() => {
+					if (!canHoverRef.current) setOpen((prev) => !prev);
+				}}
 				className="bg-primary/10 hover:bg-primary/20 decoration-primary/70 focus-visible:ring-ring/50 cursor-help rounded-sm px-1 py-0.5 underline decoration-dotted underline-offset-4 transition-colors outline-none focus-visible:ring-3"
 			>
 				{phonetic ? (

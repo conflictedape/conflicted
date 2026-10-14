@@ -11,11 +11,15 @@ const iconFor = { github: GithubIcon, x: XIcon, mail: Mail } as const;
 
 <section class="grid gap-10 sm:grid-cols-[1fr_auto] sm:items-start">
 	<div class="space-y-6">
-		<h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">
+		<h1
+			class="text-3xl leading-snug font-extrabold tracking-tight sm:text-4xl sm:leading-snug md:text-4xl md:leading-snug lg:text-5xl lg:leading-tight xl:text-6xl xl:leading-tight"
+		>
 			Hi, I'm <span class="text-primary">{PROFILE.name}</span>.
 		</h1>
 
-		<div class="text-muted-foreground max-w-2xl space-y-3 text-xl leading-6.75">
+		<div
+			class="text-muted-foreground max-w-2xl space-y-3 text-base leading-6 sm:text-lg sm:leading-7 md:text-lg md:leading-7 lg:text-xl lg:leading-8"
+		>
 			{PROFILE.bio.map((paragraph) => <p>{paragraph}</p>)}
 		</div>
 
@@ -67,13 +71,13 @@ const iconFor = { github: GithubIcon, x: XIcon, mail: Mail } as const;
 				<img
 					src={withBase(PROFILE.photo.src)}
 					alt={PROFILE.photo.alt}
-					class="border-border h-97.5 w-97.5 rounded-xl border object-cover"
+					class="border-border aspect-square w-56 max-w-full rounded-xl border object-cover sm:w-60 md:w-64 lg:w-80 xl:w-97.5"
 					width="390"
 					height="390"
 				/>
 			) : (
 				<div
-					class="border-border bg-muted text-muted-foreground flex h-97.5 w-97.5 items-center justify-center rounded-xl border font-mono text-4xl"
+					class="border-border bg-muted text-muted-foreground flex aspect-square w-56 max-w-full items-center justify-center rounded-xl border font-mono text-4xl sm:w-60 md:w-64 lg:w-80 xl:w-97.5"
 					aria-label={PROFILE.photo.alt}
 					role="img"
 				>
