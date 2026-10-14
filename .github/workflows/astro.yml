@@ -4,6 +4,10 @@ on:
   push:
     branches: ['main']
 
+  schedule:
+    # Midnight IST (UTC+05:30); GitHub cron runs in UTC.
+    - cron: '30 18 * * *'
+
   workflow_dispatch:
 
 permissions:
