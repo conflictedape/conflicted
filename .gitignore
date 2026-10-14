@@ -12,6 +12,7 @@ lerna-debug.log*
 # deps and builds
 node_modules
 dist
+dist-pages
 dist-ssr
 *.local
 tasks.txt

@@ -14,7 +14,7 @@ function normalizeBasePath(path: string): string {
 	return withLeadingSlash.endsWith('/') ? withLeadingSlash : `${withLeadingSlash}/`;
 }
 
-// Read once from the BASE_PATH env var (see .github/workflows/astro.yml,
+// Read once from the BASE_PATH env var (see .github/workflows/deploy.yml,
 // which currently sets this to "/conflicted" for the GitHub Pages deploy).
 // Passed straight into Astro's `base` config in astro.config.ts — this is
 // the single source of truth for the site's deployment sub-path, and is "/"

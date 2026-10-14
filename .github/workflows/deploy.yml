@@ -1,0 +1,113 @@
+name: Deploy Astro site
+
+on:
+  push:
+    branches: ['main']
+
+  schedule:
+    # Midnight IST (UTC+05:30); GitHub cron runs in UTC.
+    - cron: '30 18 * * *'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: 'deploy'
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      # Secrets used by scripts/sync/spotify.ts and scripts/sync/backloggd.ts.
+      # Set these under repo Settings > Secrets and variables > Actions.
+      SPOTIFY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+      SPOTIFY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
+      SPOTIFY_REFRESH_TOKEN: ${{ secrets.SPOTIFY_REFRESH_TOKEN }}
+      BACKLOGGD_PROFILE_ID: ${{ secrets.BACKLOGGD_PROFILE_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync Spotify/Backloggd data
+        run: pnpm run sync
+
+      # Domain root build for Cloudflare (conflictedape.dev).
+      - name: Build for Cloudflare
+        run: pnpm run build
+
+      # Sub-path build for GitHub Pages (username.github.io/conflicted).
+      - name: Build for GitHub Pages
+        run: pnpm run build --outDir dist-pages
+        env:
+          BASE_PATH: /conflicted
+
+      - name: Upload Cloudflare artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-dist
+          path: dist
+          if-no-files-found: error
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist-pages
+
+  deploy-cloudflare:
+    name: Deploy to Cloudflare
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Cloudflare artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cloudflare-dist
+          path: dist
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

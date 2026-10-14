@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { ListTree, X } from 'lucide-react';
 
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import {
 	DEFAULT_EASING,
 	scrollToHeading,
@@ -28,6 +30,9 @@ export function TOC({ headings, scrollEasing = DEFAULT_EASING }: TOCProps) {
 		[headings]
 	);
 	const [activeSlug, setActiveSlug] = useState(TOP_SLUG);
+	// Only used below the `lg` breakpoint, where the sidebar collapses into a
+	// floating button that opens the same table of contents in a bottom sheet.
+	const [drawerOpen, setDrawerOpen] = useState(false);
 	const easingRef = useRef(scrollEasing);
 	easingRef.current = scrollEasing;
 	const clickScrollingRef = useRef(false);
@@ -77,6 +82,7 @@ export function TOC({ headings, scrollEasing = DEFAULT_EASING }: TOCProps) {
 		setActiveSlug(slug);
 		scrollToHeading(target, easingRef.current);
 		history.pushState(null, '', `#${slug}`);
+		setDrawerOpen(false);
 	}
 
 	function handleTopClick(e: React.MouseEvent<HTMLAnchorElement>) {
@@ -85,10 +91,11 @@ export function TOC({ headings, scrollEasing = DEFAULT_EASING }: TOCProps) {
 		setActiveSlug(TOP_SLUG);
 		scrollToTop(easingRef.current);
 		history.pushState(null, '', window.location.pathname + window.location.search);
+		setDrawerOpen(false);
 	}
 
-	return (
-		<aside className="border-border bg-card/60 sticky top-24 rounded-xl border p-5 shadow-sm backdrop-blur">
+	const navContent = (
+		<>
 			<a
 				href="#"
 				onClick={handleTopClick}
@@ -120,6 +127,47 @@ export function TOC({ headings, scrollEasing = DEFAULT_EASING }: TOCProps) {
 					})}
 				</ol>
 			</nav>
-		</aside>
+		</>
+	);
+
+	return (
+		<>
+			{/* Desktop: sticky sidebar, always visible */}
+			<aside className="border-border bg-card/60 sticky top-24 hidden rounded-xl border p-5 shadow-sm backdrop-blur lg:block">
+				{navContent}
+			</aside>
+
+			{/* Mobile/tablet: floating button that opens the same TOC in a bottom sheet */}
+			<button
+				type="button"
+				onClick={() => setDrawerOpen(true)}
+				aria-label="Open table of contents"
+				className="border-border bg-card text-foreground fixed right-5 bottom-5 z-40 flex h-12 w-12 items-center justify-center rounded-full border shadow-lg transition-transform hover:scale-105 active:scale-95 lg:hidden"
+			>
+				<ListTree className="h-5 w-5" />
+			</button>
+
+			<Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
+				<DialogContent
+					showCloseButton={false}
+					className="top-auto bottom-0 left-0 max-h-[70vh] w-full max-w-full translate-x-0 translate-y-0 overflow-y-auto rounded-t-2xl rounded-b-none p-5 sm:max-w-full"
+				>
+					<div className="mb-2 flex items-center justify-between">
+						<DialogTitle className="text-sm font-semibold tracking-[0.2em] uppercase">
+							Table of contents
+						</DialogTitle>
+						<button
+							type="button"
+							onClick={() => setDrawerOpen(false)}
+							aria-label="Close table of contents"
+							className="text-muted-foreground hover:text-foreground transition-colors"
+						>
+							<X className="h-5 w-5" />
+						</button>
+					</div>
+					{navContent}
+				</DialogContent>
+			</Dialog>
+		</>
 	);
 }

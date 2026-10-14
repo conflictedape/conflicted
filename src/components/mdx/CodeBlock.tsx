@@ -80,7 +80,7 @@ export function CodeBlock({ children, filename, language }: CodeBlockProps) {
 					</Button>
 				</div>
 			</div>
-			<pre className="text-foreground wrap-break-words p-4 text-sm leading-7 whitespace-pre-wrap">
+			<pre className="text-foreground overflow-x-auto p-4 text-sm leading-7 whitespace-pre">
 				<code>{children}</code>
 			</pre>
 		</div>
