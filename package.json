@@ -48,7 +48,8 @@
 		"shadcn": "^4.16.2",
 		"sharp": "^0.35.3",
 		"tailwindcss": "^4.3.3",
-		"vfile": "^6.0.3"
+		"vfile": "^6.0.3",
+		"wrangler": "^4.150.0"
 	},
 	"dependencies": {
 		"@astrojs/markdown-remark": "^7.2.2",
